@@ -5,13 +5,14 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { createDoor, updateDoor } from './Door'
 import { createGUI } from '../utils/gui'
 
 const container = ref<HTMLDivElement | null>(null)
 
-onMounted(() => {
+onMounted(async () => {
+  const { OrbitControls } = await import('three/examples/jsm/controls/OrbitControls')
+
   const scene = new THREE.Scene()
 
   const canvas = document.createElement('canvas')
@@ -113,7 +114,7 @@ onMounted(() => {
   })
 })
 </script>
-
+ 
 <style scoped>
 .scene {
   width: 100vw;
