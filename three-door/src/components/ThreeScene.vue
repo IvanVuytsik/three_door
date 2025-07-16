@@ -54,10 +54,7 @@ onMounted(() => {
   dirLight.shadow.camera.near = 1
   dirLight.shadow.camera.far = 20
   scene.add(dirLight)
-
-  const ambientLight = new THREE.AmbientLight(0xfef8ec, 0.6)
-  scene.add(ambientLight)
-
+ 
   const ground = new THREE.Mesh(
     new THREE.PlaneGeometry(100, 100),
     new THREE.MeshStandardMaterial({ color: 0xe6dfcc, roughness: 0.9, metalness: 0.04 })
