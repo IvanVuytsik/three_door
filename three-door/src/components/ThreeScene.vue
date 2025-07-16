@@ -117,21 +117,26 @@ onMounted(() => {
   scene.add(door)
   createGUI(doorParams, () => updateDoor(door, doorParams))
 
+  let frame = 0
+
   function animate() {
     requestAnimationFrame(animate)
 
-    cube.visible = false
-    cubeCam.position.copy(cube.position)
-    cubeCam.update(renderer, scene)
-    cube.visible = true
+    if (frame % 60 === 0) {
+      cube.visible = false
+      cubeCam.position.copy(cube.position)
+      cubeCam.update(renderer, scene)
+      cube.visible = true
 
-    sphere.visible = false
-    sphereCam.position.copy(sphere.position)
-    sphereCam.update(renderer, scene)
-    sphere.visible = true
+      sphere.visible = false
+      sphereCam.position.copy(sphere.position)
+      sphereCam.update(renderer, scene)
+      sphere.visible = true
+    }
 
     controls.update()
     renderer.render(scene, camera)
+    frame++
   }
 
   animate()
