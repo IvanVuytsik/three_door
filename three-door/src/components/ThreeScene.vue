@@ -11,7 +11,7 @@ import { createGUI } from '../utils/gui'
 const container = ref<HTMLDivElement | null>(null)
 
 onMounted(async () => {
-  const { OrbitControls } = await import('three/examples/jsm/controls/OrbitControls')
+  const { OrbitControls } = await import('three/examples/jsm/controls/OrbitControls.js')
 
   const scene = new THREE.Scene()
 
