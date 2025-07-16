@@ -5,14 +5,13 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import * as THREE from 'three'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { createDoor, updateDoor } from './Door'
 import { createGUI } from '../utils/gui'
 
 const container = ref<HTMLDivElement | null>(null)
 
-onMounted(async () => {
-  const { OrbitControls } = await import('three/examples/jsm/controls/OrbitControls.js')
-
+onMounted(() => {
   const scene = new THREE.Scene()
 
   const canvas = document.createElement('canvas')
@@ -68,18 +67,40 @@ onMounted(async () => {
   ground.position.y = 0
   scene.add(ground)
 
-  const cube = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 1, 1),
-    new THREE.MeshStandardMaterial({ color: 0xf2b5a3, metalness: 0.1, roughness: 0.75 })
-  )
+  const cubeCamRT = new THREE.WebGLCubeRenderTarget(256, {
+    format: THREE.RGBAFormat,
+    generateMipmaps: true,
+    minFilter: THREE.LinearMipmapLinearFilter
+  })
+  const cubeCam = new THREE.CubeCamera(0.1, 1000, cubeCamRT)
+  scene.add(cubeCam)
+
+  const sphereCamRT = new THREE.WebGLCubeRenderTarget(256, {
+    format: THREE.RGBAFormat,
+    generateMipmaps: true,
+    minFilter: THREE.LinearMipmapLinearFilter
+  })
+  const sphereCam = new THREE.CubeCamera(0.1, 1000, sphereCamRT)
+  scene.add(sphereCam)
+
+  const cubeMaterial = new THREE.MeshStandardMaterial({
+    color: 0xf2b5a3,
+    metalness: 1,
+    roughness: 0.05,
+    envMap: cubeCamRT.texture
+  })
+  const cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), cubeMaterial)
   cube.position.set(-2, 0.5, 0)
   cube.castShadow = true
   scene.add(cube)
 
-  const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(0.5, 32, 32),
-    new THREE.MeshStandardMaterial({ color: 0xa6d8ce, metalness: 0.05, roughness: 0.6 })
-  )
+  const sphereMaterial = new THREE.MeshStandardMaterial({
+    color: 0xa6d8ce,
+    metalness: 1,
+    roughness: 0.02,
+    envMap: sphereCamRT.texture
+  })
+  const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), sphereMaterial)
   sphere.position.set(2, 0.5, 0)
   sphere.castShadow = true
   scene.add(sphere)
@@ -101,6 +122,17 @@ onMounted(async () => {
 
   function animate() {
     requestAnimationFrame(animate)
+
+    cube.visible = false
+    cubeCam.position.copy(cube.position)
+    cubeCam.update(renderer, scene)
+    cube.visible = true
+
+    sphere.visible = false
+    sphereCam.position.copy(sphere.position)
+    sphereCam.update(renderer, scene)
+    sphere.visible = true
+
     controls.update()
     renderer.render(scene, camera)
   }
@@ -114,7 +146,7 @@ onMounted(async () => {
   })
 })
 </script>
- 
+
 <style scoped>
 .scene {
   width: 100vw;
